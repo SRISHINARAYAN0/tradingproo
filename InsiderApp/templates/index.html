@@ -1,0 +1,210 @@
+<!-- TradingPro/templates/index.html -->
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home - INSIDER TRADING TRACKER{% endblock %}
+
+{% block style %}
+<style>
+    :root {
+        --primary-color: #333;
+        --secondary-color: #535252;
+        --text-color: #333;
+        --bg-color: #f4f4f4;
+        --card-bg: #fff;
+        --input-bg: #fff;
+        --input-border: #ccc;
+        --checkbox-color: #8B008B;
+    }
+
+    [data-theme="dark"] {
+        --primary-color: #333;
+        --secondary-color: #333;
+        --text-color: #e0e0e0;
+        --bg-color: #121212;
+        --card-bg: #1e1e1e;
+        --input-bg: #2c2c2c;
+        --input-border: #444;
+        --checkbox-color: #8B008B;
+    }
+
+    body {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        transition: all 0.3s ease;
+    }
+
+    .content-wrapper {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 1rem;
+    }
+
+    .card {
+        background-color: var(--card-bg);
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .gradient-text {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        color: transparent;
+    }
+
+    .custom-input {
+        background-color: var(--input-bg);
+        border: 1px solid var(--input-border);
+        color: var(--text-color);
+        transition: all 0.3s ease;
+    }
+
+    .custom-input::placeholder {
+        color: var(--text-color);
+        opacity: 0.6;
+    }
+
+    .btn-hover-effect:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .checkbox-primary:checked {
+        background-color: var(--checkbox-color) !important;
+        border-color: var(--checkbox-color) !important;
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color) !important;
+        border-color: var(--primary-color) !important;
+        color: #fff !important;
+    }
+
+    .btn-primary:hover {
+        background-color: var(--secondary-color) !important;
+        border-color: var(--secondary-color) !important;
+    }
+
+    @media (max-width: 768px) {
+        .content-wrapper {
+            padding: 0.5rem;
+        }
+        .card {
+            padding: 1rem !important;
+        }
+        .grid {
+            grid-template-columns: 1fr !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+    <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 text-center gradient-text">
+        SEC FORM 4 INSIDER TRADING SCREENER
+    </h1>
+    <div class="card p-4 md:p-6 lg:p-8">
+        <h2 class="text-xl md:text-2xl lg:text-3xl font-bold mb-4 gradient-text">
+            Insider Trading Search
+        </h2>
+        {% if error %}
+        <div class="alert alert-error mb-4" role="alert">
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <span>{{ error }}</span>
+        </div>
+        {% endif %}
+        <form method="post" action="{% url 'homepage' %}" class="space-y-4">
+            {% csrf_token %}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="form-control">
+                    <label class="label" for="ticker">
+                        <span class="label-text">Ticker Symbol</span>
+                    </label>
+                    <input type="text" id="ticker" name="ticker" placeholder="Enter ticker symbol (e.g., AAPL)" class="input input-bordered w-full custom-input" required />
+                </div>
+                <div class="form-control">
+                    <label class="label" for="insider">
+                        <span class="label-text">Insider</span>
+                    </label>
+                    <input type="text" id="insider" name="insider" placeholder="Insider name and CIK" class="input input-bordered w-full custom-input" />
+                </div>
+                <div class="form-control">
+                    <label class="label" for="datePeriod">
+                        <span class="label-text">Select Date Period</span>
+                    </label>
+                    <select id="datePeriod" name="datePeriod" class="select select-bordered w-full custom-input" onchange="handleDatePeriodChange()">
+                        <option value="all" selected>All Date</option>
+                        <option value="latest">Latest Day</option>
+                        <option value="one_month">One Month</option>
+                        <option value="custom">Custom</option>
+                    </select>
+                </div>
+                <div id="customDateRange" class="hidden space-y-2">
+                    <div class="form-control">
+                        <label class="label" for="custom_start_date">
+                            <span class="label-text">Custom Start Date</span>
+                        </label>
+                        <input type="date" id="custom_start_date" name="custom_start_date" class="input input-bordered w-full custom-input" />
+                    </div>
+                    <div class="form-control">
+                        <label class="label" for="custom_end_date">
+                            <span class="label-text">Custom End Date</span>
+                        </label>
+                        <input type="date" id="custom_end_date" name="custom_end_date" class="input input-bordered w-full custom-input" />
+                    </div>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                <div class="card p-6">
+                    <h3 class="text-lg font-bold mb-4 gradient-text">
+                        Transaction Filing
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {% for checkbox in transaction_filings %}
+                        <div class="form-control">
+                            <label class="label cursor-pointer justify-start items-center space-x-3">
+                                <input type="checkbox" class="checkbox checkbox-primary" id="{{ checkbox.0|lower }}checkbox" name="transaction_filing" value="{{ checkbox.0 }}"  />
+                                <span class="label-text">{{ checkbox.0 }} - {{ checkbox.1 }}</span>
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="card p-6">
+                    <h3 class="text-lg font-bold mb-4 gradient-text">Insider Title</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {% for checkbox in insider_titles %}
+                        <div class="form-control">
+                            <label class="label cursor-pointer justify-start items-center space-x-3">
+                                <input type="checkbox" class="checkbox checkbox-primary" id="{{ checkbox.0|lower }}checkbox" name="insider_title" value="{{ checkbox.0 }}" />
+                                <span class="label-text">{{ checkbox.1 }}</span>
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="mt-6 text-center">
+                <button type="submit" class="btn btn-primary btn-wide btn-hover-effect">
+                    Search
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+    function handleDatePeriodChange() {
+        const datePeriod = document.getElementById("datePeriod").value;
+        const customDateRange = document.getElementById("customDateRange");
+        customDateRange.classList.toggle("hidden", datePeriod !== "custom");
+    }
+</script>
+{% endblock %}

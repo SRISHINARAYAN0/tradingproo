@@ -1,0 +1,108 @@
+<!-- TradingPro/templates/base.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Insider Trading Tracker{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@3.5.0/dist/full.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.0.0/dist/chartjs-plugin-annotation.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="{% static 'css/output.css' %}" rel="stylesheet">
+    <!-- Added Font Awesome for premium icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.css">
+    {% block style %}{% endblock %}
+    <style>
+        .premium-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col bg-base-200">
+    <nav class="navbar premium-gradient text-white shadow-lg">
+        <div class="navbar-start">
+            <div class="dropdown">
+                <label tabindex="0" class="btn btn-ghost lg:hidden">
+                    <i class="fas fa-bars"></i>
+                </label>
+                <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+                    <li><a href="{% url 'homepage' %}"><i class="fas fa-home mr-2"></i>Home</a></li>
+                    <li><a><i class="fas fa-info-circle mr-2"></i>About</a></li>
+                    <li><a><i class="fas fa-envelope mr-2"></i>Contact</a></li>
+                </ul>
+            </div>
+            <a href="{% url 'homepage' %}" class="btn btn-ghost normal-case text-xl">
+                <i class="fas fa-chart-line mr-2"></i>INSIDER TRADING TRACK
+            </a>
+        </div>
+        <div class="navbar-center hidden lg:flex">
+            <ul class="menu menu-horizontal px-1">
+                <li><a href="{% url 'homepage' %}"><i class="fas fa-home mr-2"></i>Home</a></li>
+                <li><a><i class="fas fa-info-circle mr-2"></i>About</a></li>
+                <li><a><i class="fas fa-envelope mr-2"></i>Contact</a></li>
+            </ul>
+        </div>
+        <div class="navbar-end">
+          <label class="swap swap-rotate">
+            <input type="checkbox" class="theme-controller" id="themeToggle" />
+            <i class="fas fa-sun swap-on fill-current w-6 h-6"></i>
+            <i class="fas fa-moon swap-off fill-current w-6 h-6"></i>
+          </label>
+        </div>
+    </nav>
+
+    <main class="container mx-auto py-6 px-4 flex-grow">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Added a premium footer -->
+    <footer class="footer footer-center p-10 bg-primary text-primary-content">
+      <div>
+        <i class="fas fa-chart-pie text-3xl mb-2"></i>
+        <p class="font-bold">
+          Insider Trading Track Ltd. <br>Providing reliable trading insights since 2024
+        </p> 
+        <p>Copyright © 2024 - All rights reserved</p>
+      </div> 
+      <div>
+        <div class="grid grid-flow-col gap-4">
+          <a><i class="fab fa-twitter text-2xl"></i></a> 
+          <a><i class="fab fa-facebook text-2xl"></i></a> 
+          <a><i class="fab fa-instagram text-2xl"></i></a>
+        </div>
+      </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.js"></script>
+    <!-- Updated theme toggle script with smooth transition -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        const toggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        html.setAttribute('data-theme', currentTheme);
+        toggle.checked = currentTheme === 'dark';
+
+        toggle.addEventListener('change', function(e) {
+          const theme = e.target.checked ? 'dark' : 'light';
+          html.style.transition = 'background-color 0.3s ease';
+          html.setAttribute('data-theme', theme);
+          localStorage.setItem('theme', theme);
+          setTimeout(() => {
+            html.style.transition = '';
+          }, 300);
+        });
+      });
+    </script>
+    {% block script %}{% endblock %}
+</body>
+</html>
