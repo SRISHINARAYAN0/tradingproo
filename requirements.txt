@@ -85,7 +85,7 @@ multidict==6.0.2
 mypy-extensions==1.0.0
 numpy==1.24.4
 packaging==23.2
-pandas==2.2.1
+pandas==1.5.3
 parsedatetime==2.6
 pexpect==4.9.0
 pillow==10.2.0
